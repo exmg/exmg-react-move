@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import { toArray, merge, difference } from './helpers';
 
-export default class Flip extends Component {
+export default class Move extends Component {
 	static propTypes = {
 		children: PropTypes.node,
 	};

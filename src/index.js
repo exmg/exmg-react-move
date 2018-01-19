@@ -1,2 +1,2 @@
-export { default } from './Flip';
+export { default } from './Move';
 
