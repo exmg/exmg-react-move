@@ -102,19 +102,20 @@ export default class Move extends Component {
 
 					const { node, transform } = data;
 
-					node.style.transition = 'opacity 160ms, transform 260ms ease-out';
-
 					if (this.createQueue.indexOf(key) >= 0) {
-						node.style.opacity = 1;
+                        node.style.transition = 'opacity 160ms, transform 260ms ease-out';
+						node.style.opacity = '1';
 						node.style.transform = `scale(1)`;
 					} else if (this.removeQueue.indexOf(key) >= 0) {
-						node.style.opacity = 0;
+                        node.style.transition = 'opacity 160ms, transform 260ms ease-out';
+						node.style.opacity = '0';
 						node.style.transform = `${transform} scale(0.1)`;
 
 						this.addEndedListener(key);
 					} else {
-						node.style.opacity = 1;
-						node.style.transform = `translate3d(0, 0, 0)`;
+						node.style.transition = '';
+						node.style.opacity = '';
+						node.style.transform = '';
 					}
 				});
 			});
