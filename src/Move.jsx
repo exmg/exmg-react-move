@@ -104,11 +104,11 @@ export default class Move extends Component {
 					const transition = 'opacity 160ms, transform 260ms ease-out';
 
 					if (this.createQueue.indexOf(key) >= 0) {
-                        node.style.transition = transition;
+					 	node.style.transition = transition;
 						node.style.opacity = '1';
 						node.style.transform = `scale(1)`;
 					} else if (this.removeQueue.indexOf(key) >= 0) {
-                        node.style.transition = transition;
+					 	node.style.transition = transition;
 						node.style.opacity = '0';
 						node.style.transform = `${transform} scale(0.1)`;
 
