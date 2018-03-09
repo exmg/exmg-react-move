@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/exmg/exmg-react-move#readme",
   "devDependencies": {
+    "@exmg/eslint-config-react": "^1.0.1",
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.3",
     "babel-plugin-external-helpers": "^6.22.0",
