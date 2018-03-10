@@ -1,10 +1,3 @@
-import React from 'react';
-
-/**
- *
- */
-export const { toArray } = React.Children;
-
 /**
  *
  * @param {Array} current
@@ -15,7 +8,7 @@ export const merge = (current, next) =>
 		.filter((element, index, array) =>
 			array.findIndex($element => $element.key === element.key) === index);
 
-export const difference = (current, next) => {
+export const diff = (current, next) => {
 	const added = next.filter(item => !current.find(({ key }) => item.key === key));
 	const removed = current.filter(item => !next.find(({ key }) => item.key === key));
 

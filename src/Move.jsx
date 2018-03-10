@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, Children } from 'react';
 import { findDOMNode } from 'react-dom';
 import PropTypes from 'prop-types';
-
-import { toArray, merge, difference, shallowEqualsArray } from './helpers';
+import { merge, diff, shallowEqualsArray } from './helpers';
 
 export default class Move extends Component {
 	static propTypes = {
@@ -16,18 +15,18 @@ export default class Move extends Component {
 	state = {
 		children: [],
 		remove: [],
-		childrenData: {},
+		removed: [],
 	};
 
 	childrenData = {};
 
 	static getDerivedStateFromProps(nextProps, prevState) {
-		const currentChildren = prevState.children; // .filter(child => prevProps.removed.indexOf(child.key) === -1);
-		const nextChildren = toArray(nextProps.children);
+		// Filter out removed nodes
+		const currentChildren = prevState.children
+			.filter(({ key }) => prevState.removed.indexOf(key) === -1);
+		const nextChildren = Children.toArray(nextProps.children);
 		const children = merge(currentChildren, nextChildren);
-		const { added, removed } = difference(currentChildren, nextChildren);
-
-		// filter children by childrenData[key].removed === true?
+		const { added, removed } = diff(currentChildren, nextChildren);
 
 		return {
 			children,
@@ -84,10 +83,10 @@ export default class Move extends Component {
 	}
 
 	play() {
-		const { children, remove } = this.state;
-
 		requestAnimationFrame(() => {
 			requestAnimationFrame(() => {
+				const { children, remove } = this.state;
+
 				children.forEach(({ key }) => {
 					const data = this.childrenData[key];
 
@@ -97,22 +96,33 @@ export default class Move extends Component {
 
 					const { node, first, last } = data;
 
-					node.style.transition = 'opacity 220ms, transform 220ms ease-out';
 
-					/* if (add.indexOf(key) >= 0) {
-						node.style.opacity = 1;
-						node.style.transform = `scale(1) translate3d(0,0,0) `;
-					} else */
 					if (remove.indexOf(key) >= 0) {
+						this.onTransitionEnd(node, () => {
+							this.setState(state => ({ removed: [...state.removed, key] }));
+						});
+
+						node.style.transition = 'opacity 220ms, transform 220ms ease-out';
 						node.style.opacity = 0;
 						node.style.transform = `translate3d(${first.x - last.x}px, ${first.y - last.y}px, 0) scale(.1)`;
 					} else {
+						node.style.transition = 'opacity 220ms, transform 220ms cubic-bezier(0.770, 0, 0.175, 1)';
 						node.style.opacity = 1;
 						node.style.transform = 'translate3d(0,0,0) scale(1)';
 					}
 				});
 			});
 		});
+	}
+
+	onTransitionEnd(node, callback) {
+		const listener = () => {
+			callback();
+
+			node.removeEventListener('transitionend', listener);
+		};
+
+		node.addEventListener('transitionend', listener);
 	}
 
 	setPositions(type) {
@@ -142,30 +152,18 @@ export default class Move extends Component {
 			throw new Error(`Expected ELEMENT_NODE`);
 		}
 
-		const { childrenData } = this.state;
-
 		if (!this.childrenData[key]) {
 			// Initial styling
 			node.style.transform = 'translate3d(0,0,0) scale(0)';
+
+			this.childrenData[key] = { node };
 		}
-
-		// setState updates state async, so also store as class prop..
-		this.childrenData = {
-			...this.childrenData,
-			[key]: {
-				...this.childrenData[key],
-				node,
-			},
-		};
-
-		this.setState({ childrenData });
 	}
 
 	renderComponent = component =>
 		React.cloneElement(component, { ref: this.addNode(component.key) })
 
 	render() {
-		// aka componentWillUpdate
 		this.first();
 
 		return this.state.children.map(this.renderComponent);
