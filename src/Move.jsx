@@ -26,12 +26,12 @@ export default class Move extends Component {
 			.filter(({ key }) => prevState.removed.indexOf(key) === -1);
 		const nextChildren = Children.toArray(nextProps.children);
 		const children = merge(currentChildren, nextChildren);
-		const { added, removed } = diff(currentChildren, nextChildren);
+		const { removed } = diff(currentChildren, nextChildren);
 
 		return {
 			children,
-			add: added,
 			remove: removed,
+			removed: [],
 		};
 	}
 
@@ -84,34 +84,35 @@ export default class Move extends Component {
 
 	play() {
 		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
-				const { children, remove } = this.state;
+			requestAnimationFrame(this.animate);
+		});
+	}
 
-				children.forEach(({ key }) => {
-					const data = this.childrenData[key];
+	animate = () => {
+		const { children, remove } = this.state;
 
-					if (!data || !data.node) {
-						return;
-					}
+		children.forEach(({ key }) => {
+			const data = this.childrenData[key];
 
-					const { node, first, last } = data;
+			if (!data || !data.node) {
+				return;
+			}
 
+			const { node, first, last } = data;
 
-					if (remove.indexOf(key) >= 0) {
-						this.onTransitionEnd(node, () => {
-							this.setState(state => ({ removed: [...state.removed, key] }));
-						});
+			node.style.transition = 'opacity 220ms, transform 220ms cubic-bezier(0.4, 0.0, 0.2, 1)';
 
-						node.style.transition = 'opacity 220ms, transform 220ms ease-out';
-						node.style.opacity = 0;
-						node.style.transform = `translate3d(${first.x - last.x}px, ${first.y - last.y}px, 0) scale(.1)`;
-					} else {
-						node.style.transition = 'opacity 220ms, transform 220ms cubic-bezier(0.770, 0, 0.175, 1)';
-						node.style.opacity = 1;
-						node.style.transform = 'translate3d(0,0,0) scale(1)';
-					}
+			if (remove.indexOf(key) >= 0) {
+				this.onTransitionEnd(node, () => {
+					this.setState(state => ({ removed: [...state.removed, key] }));
 				});
-			});
+
+				node.style.opacity = 0;
+				node.style.transform = `translate3d(${first.x - last.x}px, ${first.y - last.y}px, 0) scale(.1)`;
+			} else {
+				node.style.opacity = 1;
+				node.style.transform = 'translate3d(0,0,0) scale(1)';
+			}
 		});
 	}
 
@@ -135,7 +136,6 @@ export default class Move extends Component {
 				return;
 			}
 
-			// data.node.style.display = '';
 			data[type] = data.node.getBoundingClientRect();
 		});
 	}
