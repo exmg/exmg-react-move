@@ -47,6 +47,12 @@ export default class Move extends Component {
 		this.play();
 	}
 
+	getSnapshotBeforeUpdate() {
+		this.first();
+
+		return null;
+	}
+
 	shouldComponentUpdate(nextProps, nextState) {
 		return !shallowEqualsArray(this.state.children, nextState.children)
 			|| !shallowEqualsArray(this.state.remove, nextState.remove);
@@ -164,8 +170,6 @@ export default class Move extends Component {
 		React.cloneElement(component, { ref: this.addNode(component.key) })
 
 	render() {
-		this.first();
-
 		return this.state.children.map(this.renderComponent);
 	}
 }
