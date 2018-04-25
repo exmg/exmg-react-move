@@ -1,14 +1,11 @@
-/**
- *
- * @param {Array} current
- * @param {Array} next
- */
-export const merge = (current, next) =>
+type JSXElementArray = JSX.Element[];
+
+export const merge = (current: JSXElementArray, next: JSXElementArray) =>
 	next.concat(current)
 		.filter((element, index, array) =>
 			array.findIndex($element => $element.key === element.key) === index);
 
-export const diff = (current, next) => {
+export const diff = (current: JSXElementArray, next: JSXElementArray) => {
 	const added = next.filter(item => !current.find(({ key }) => item.key === key));
 	const removed = current.filter(item => !next.find(({ key }) => item.key === key));
 
@@ -18,7 +15,7 @@ export const diff = (current, next) => {
 	};
 };
 
-export const shallowEqualsArray = (a, b) => {
+export const shallowEqualsArray = (a: any[], b: any[]) => {
 	const { length } = a;
 
 	if (a.length !== b.length) {

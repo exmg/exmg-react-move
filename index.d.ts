@@ -1,7 +1,7 @@
 /// <reference types="react" />
-import * as React from 'react';
+import React, { Component } from 'react';
 export interface MoveProps {
-    children?: JSX.Element | JSX.Element[];
+    children?: JSX.Element[];
 }
 export interface MoveState {
     children: any[];
@@ -16,38 +16,24 @@ export interface ChildData {
 export interface ChildrenData {
     [key: string]: ChildData;
 }
-declare class Move extends React.Component<MoveProps, MoveState> {
-    static defaultProps: {
-        children: any;
-    };
-    state: {
-        children: any[];
-        remove: any[];
-        removed: any[];
-    };
+declare class Move extends Component<MoveProps, MoveState> {
+    static defaultProps: Partial<MoveProps>;
+    state: MoveState;
     childrenData: ChildrenData;
-    static getDerivedStateFromProps(nextProps: any, prevState: any): {
-        children: any;
-        remove: any;
-        removed: any[];
-    };
+    static getDerivedStateFromProps(nextProps: MoveProps, prevState: MoveState): MoveState;
     componentDidMount(): void;
     componentDidUpdate(): void;
-    getSnapshotBeforeUpdate(): any;
-    shouldComponentUpdate(nextProps: any, nextState: any): boolean;
+    getSnapshotBeforeUpdate(): void;
+    shouldComponentUpdate(nextProps: MoveProps, nextState: MoveState): boolean;
     first(): void;
     last(): void;
     invert(): void;
     play(): void;
     animate: () => void;
-    onTransitionEnd(node: any, callback: any): void;
-    setPositions(type: any): void;
+    onTransitionEnd(node: HTMLElement, callback: () => void): void;
+    setPositions(type: 'first' | 'last'): void;
     addNode: (key: any) => (element: HTMLElement) => void;
-    renderComponent: (component: any) => React.SFCElement<{
-        ref: (element: HTMLElement) => void;
-    }>;
-    render(): React.SFCElement<{
-        ref: (element: HTMLElement) => void;
-    }>[];
+    renderComponent: (component: JSX.Element) => React.ReactElement<any>;
+    render(): React.ReactElement<any>[];
 }
 export default Move;

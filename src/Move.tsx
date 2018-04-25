@@ -1,30 +1,47 @@
 import React, { Component, Children } from 'react';
 import { findDOMNode } from 'react-dom';
-import PropTypes from 'prop-types';
+import { polyfill } from 'react-lifecycles-compat';
+
 import { merge, diff, shallowEqualsArray } from './helpers';
 
-export default class Move extends Component {
-	static propTypes = {
-		children: PropTypes.node,
-	};
+export interface MoveProps {
+    children?: JSX.Element[];
+}
 
-	static defaultProps = {
+export interface MoveState {
+	children: any[];
+	remove: any[];
+	removed: any[];
+}
+
+export interface ChildData {
+	node: HTMLElement;
+	first?: DOMRect;
+	last?: DOMRect;
+}
+
+export interface ChildrenData {
+	[key: string]: ChildData;
+}
+
+class Move extends Component<MoveProps, MoveState> {
+	static defaultProps: Partial<MoveProps> = {
 		children: null,
 	};
 
-	state = {
+	state: MoveState = {
 		children: [],
 		remove: [],
 		removed: [],
 	};
 
-	childrenData = {};
+	childrenData: ChildrenData = {};
 
-	static getDerivedStateFromProps(nextProps, prevState) {
+	static getDerivedStateFromProps(nextProps: MoveProps, prevState: MoveState) {
 		// Filter out removed nodes
 		const currentChildren = prevState.children
 			.filter(({ key }) => prevState.removed.indexOf(key) === -1);
-		const nextChildren = Children.toArray(nextProps.children);
+		const nextChildren = Children.toArray(nextProps.children) as JSX.Element[];
 		const children = merge(currentChildren, nextChildren);
 		const { removed } = diff(currentChildren, nextChildren);
 
@@ -32,7 +49,7 @@ export default class Move extends Component {
 			children,
 			remove: removed,
 			removed: [],
-		};
+		} as MoveState;
 	}
 
 	componentDidMount() {
@@ -47,13 +64,13 @@ export default class Move extends Component {
 		this.play();
 	}
 
-	getSnapshotBeforeUpdate() {
+	getSnapshotBeforeUpdate(): void {
 		this.first();
 
 		return null;
 	}
 
-	shouldComponentUpdate(nextProps, nextState) {
+	shouldComponentUpdate(nextProps: MoveProps, nextState: MoveState) {
 		return !shallowEqualsArray(this.state.children, nextState.children)
 			|| !shallowEqualsArray(this.state.remove, nextState.remove);
 	}
@@ -81,8 +98,9 @@ export default class Move extends Component {
 			if (last && first) {
 				// Reset display for elements to be removed
 				node.style.display = '';
+				// TODO Keep 'create' animation
 				node.style.transition = 'none';
-				node.style.opacity = 1;
+				node.style.opacity = '1';
 				node.style.transform = `translate3d(${first.x - last.x}px, ${first.y - last.y}px, 0) scale(1)`;
 			}
 		});
@@ -113,16 +131,18 @@ export default class Move extends Component {
 					this.setState(state => ({ removed: [...state.removed, key] }));
 				});
 
-				node.style.opacity = 0;
+				node.style.opacity = '0';
 				node.style.transform = `translate3d(${first.x - last.x}px, ${first.y - last.y}px, 0) scale(.1)`;
 			} else {
-				node.style.opacity = 1;
+				node.style.opacity = '1';
 				node.style.transform = 'translate3d(0,0,0) scale(1)';
 			}
 		});
 	}
 
-	onTransitionEnd(node, callback) {
+	onTransitionEnd(node: HTMLElement, callback: () => void) {
+		// data.ignore = true;
+
 		const listener = () => {
 			callback();
 
@@ -132,7 +152,7 @@ export default class Move extends Component {
 		node.addEventListener('transitionend', listener);
 	}
 
-	setPositions(type) {
+	setPositions(type: 'first' | 'last') {
 		const { children } = this.state;
 
 		children.forEach(({ key }) => {
@@ -142,13 +162,13 @@ export default class Move extends Component {
 				return;
 			}
 
-			data[type] = data.node.getBoundingClientRect();
+			data[type] = data.node.getBoundingClientRect() as DOMRect;
 		});
 	}
 
-	addNode = key => (element) => {
+	addNode = (key: any) => (element: HTMLElement) => {
 		// eslint-disable-next-line react/no-find-dom-node
-		const node = findDOMNode(element);
+		const node = findDOMNode(element) as HTMLElement;
 
 		if (!node) {
 			return;
@@ -166,10 +186,14 @@ export default class Move extends Component {
 		}
 	}
 
-	renderComponent = component =>
+    renderComponent = (component: JSX.Element) =>
 		React.cloneElement(component, { ref: this.addNode(component.key) })
 
 	render() {
 		return this.state.children.map(this.renderComponent);
 	}
 }
+
+polyfill(Move);
+
+export default Move;

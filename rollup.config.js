@@ -1,12 +1,9 @@
-import babel from 'rollup-plugin-babel';
 import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
 import pkg from './package.json';
-
-const version = process.env.VERSION || require('./package.json').version;
+import typescript from 'rollup-plugin-typescript2';
 
 const banner = `/**
- * Exmg React Move v${version}
+ * Exmg React Move v${pkg.version}
  * (C) 2017-${new Date().getFullYear()} Niek Saarberg
  * Released under the MIT License.
  */`;
@@ -14,24 +11,21 @@ const banner = `/**
 const external = [
 	...Object.keys(pkg.dependencies || {}),
 	...Object.keys(pkg.devDependencies || {}),
+	...Object.keys(pkg.peerDependencies || {}),
 ];
 
 const plugins = [
+	typescript({
+		jsx: 'react',
+	}),
 	resolve({
-		extensions: ['.js', '.jsx'],
-	}),
-	commonjs({
-		include: ['node_modules/**'],
-	}),
-	babel({
-		exclude: 'node_modules/**', // only transpile our source code
-		plugins: ['external-helpers'],
+		extensions: ['.ts', '.tsx'],
 	}),
 ];
 
 export default [
 	{
-		input: 'src/index.js',
+		input: 'src/index.ts',
 		output: {
 			file: pkg.module,
 			format: 'es',
@@ -42,7 +36,7 @@ export default [
 		plugins,
 	},
 	{
-		input: 'src/index.js',
+		input: 'src/index.ts',
 		output: {
 			file: pkg.main,
 			format: 'cjs',
