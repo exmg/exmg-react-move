@@ -1,6 +1,6 @@
 {
   "name": "exmg-react-move",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3",
   "description": "Animate updates with flip technique",
   "main": "dist/exmg-react-move.common.js",
   "module": "dist/exmg-react-move.esm.js",
