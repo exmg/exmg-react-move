@@ -2,6 +2,8 @@
 import React, { Component } from 'react';
 export interface MoveProps {
     children?: JSX.Element[];
+    duration: number;
+    timingFunction: string;
 }
 export interface MoveState {
     children: any[];
