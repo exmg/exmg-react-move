@@ -5,7 +5,11 @@ import { polyfill } from 'react-lifecycles-compat';
 import { merge, diff, shallowEqualsArray } from './helpers';
 
 export interface MoveProps {
-    children?: JSX.Element[];
+	children?: JSX.Element[];
+	// Duration in milliseconds
+	duration: number;
+	// CSS Timing function
+	timingFunction: string;
 }
 
 export interface MoveState {
@@ -27,6 +31,8 @@ export interface ChildrenData {
 class Move extends Component<MoveProps, MoveState> {
 	static defaultProps: Partial<MoveProps> = {
 		children: null,
+		duration: 220,
+		timingFunction: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
 	};
 
 	state: MoveState = {
@@ -113,6 +119,7 @@ class Move extends Component<MoveProps, MoveState> {
 	}
 
 	animate = () => {
+		const { duration, timingFunction } = this.props;
 		const { children, remove } = this.state;
 
 		children.forEach(({ key }) => {
@@ -124,7 +131,7 @@ class Move extends Component<MoveProps, MoveState> {
 
 			const { node, first, last } = data;
 
-			node.style.transition = 'opacity 220ms, transform 220ms cubic-bezier(0.4, 0.0, 0.2, 1)';
+			node.style.transition = `opacity ${duration}ms, transform ${duration}ms ${timingFunction}`;
 
 			if (remove.indexOf(key) >= 0) {
 				this.onTransitionEnd(node, () => {
