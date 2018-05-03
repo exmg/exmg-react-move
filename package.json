@@ -1,10 +1,10 @@
 {
   "name": "exmg-react-move",
-  "version": "2.0.0-beta.11",
+  "version": "2.0.0-beta.14",
   "description": "Animate updates with flip technique",
   "main": "dist/exmg-react-move.common.js",
   "module": "dist/exmg-react-move.esm.js",
-  "types": "./dist/index.d.ts",
+  "typings": "./dist/index.d.ts",
   "scripts": {
     "start": "rollup -c -w",
     "build": "rollup -c",
@@ -53,6 +53,8 @@
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-typescript2": "^0.13.0",
+    "tslint": "^5.9.1",
+    "tslint-config-airbnb": "^5.8.0",
     "typescript": "^2.8.3"
   },
   "peerDependencies": {
