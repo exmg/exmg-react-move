@@ -7,9 +7,9 @@ import { merge, diff, shallowEqualsArray } from './helpers';
 export interface MoveProps {
 	children?: JSX.Element[];
 	// Duration in milliseconds
-	duration: number;
+	duration?: number;
 	// CSS Timing function
-	timingFunction: string;
+	timingFunction?: string;
 }
 
 export interface MoveState {
@@ -70,7 +70,7 @@ class Move extends Component<MoveProps, MoveState> {
 		this.play();
 	}
 
-	getSnapshotBeforeUpdate(): any {
+	getSnapshotBeforeUpdate(): null {
 		this.first();
 
 		return null;
