@@ -5,7 +5,7 @@ import { polyfill } from 'react-lifecycles-compat';
 import { merge, diff, shallowEqualsArray } from './helpers';
 
 export interface MoveProps {
-	children?: JSX.Element[];
+	children?: JSX.Element | JSX.Element[];
 	// Duration in milliseconds
 	duration?: number;
 	// CSS Timing function
