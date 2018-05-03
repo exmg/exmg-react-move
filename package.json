@@ -4,7 +4,7 @@
   "description": "Animate updates with flip technique",
   "main": "dist/exmg-react-move.common.js",
   "module": "dist/exmg-react-move.esm.js",
-  "typings": "./index.d.ts",
+  "typings": "./dist/index.d.ts",
   "scripts": {
     "start": "rollup -c -w",
     "build": "rollup -c",
@@ -56,7 +56,6 @@
     "typescript": "^2.8.3"
   },
   "peerDependencies": {
-    "prop-types": ">= 15.6.0",
     "react": ">= 16.0",
     "react-dom": ">= 16.0",
     "react-lifecycles-compat": ">= 3.0"

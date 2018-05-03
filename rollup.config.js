@@ -27,8 +27,8 @@ export default [
 	{
 		input: 'src/index.ts',
 		output: {
-			file: pkg.module,
-			format: 'es',
+			file: pkg.main,
+			format: 'cjs',
 			banner,
 			sourcemap: true,
 		},
@@ -38,8 +38,8 @@ export default [
 	{
 		input: 'src/index.ts',
 		output: {
-			file: pkg.main,
-			format: 'cjs',
+			file: pkg.module,
+			format: 'es',
 			banner,
 			sourcemap: true,
 		},

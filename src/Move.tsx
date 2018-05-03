@@ -70,7 +70,7 @@ class Move extends Component<MoveProps, MoveState> {
 		this.play();
 	}
 
-	getSnapshotBeforeUpdate(): void {
+	getSnapshotBeforeUpdate(): any {
 		this.first();
 
 		return null;
