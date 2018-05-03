@@ -15,9 +15,7 @@ const external = [
 ];
 
 const plugins = [
-	typescript({
-		jsx: 'react',
-	}),
+	typescript(),
 	resolve({
 		extensions: ['.ts', '.tsx'],
 	}),
