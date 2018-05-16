@@ -5,10 +5,16 @@ import { polyfill } from 'react-lifecycles-compat';
 import { merge, diff, shallowEqualsArray } from './helpers';
 
 export interface MoveProps {
-  children?: JSX.Element | (JSX.Element | JSX.Element[])[];
-  // Duration in milliseconds
+  children?: null | any[];
+  /**
+   * Duration in milliseconds.
+   * Default 220ms
+   */
   duration?: number;
-  // CSS Timing function
+  /**
+   * CSS Timing function.
+   * Default `cubic-bezier(0.4, 0.0, 0.2, 1)`
+   */
   timingFunction?: string;
 }
 
@@ -22,6 +28,7 @@ export interface ChildData {
   node: HTMLElement;
   first?: DOMRect;
   last?: DOMRect;
+  alive: boolean;
 }
 
 export interface ChildrenData {
@@ -70,7 +77,7 @@ class Move extends Component<MoveProps, MoveState> {
     this.play();
   }
 
-  getSnapshotBeforeUpdate(): null {
+  getSnapshotBeforeUpdate() {
     this.first();
 
     return null;
@@ -99,15 +106,17 @@ class Move extends Component<MoveProps, MoveState> {
         return;
       }
 
-      const { node, first, last } = data;
+      const { node, first, last, alive } = data;
 
-      if (last && first) {
-        // Reset display for elements to be removed
+      if (alive && last && first) {
         node.style.display = '';
-        // TODO Keep 'create' animation
         node.style.transition = 'none';
         node.style.opacity = '1';
         node.style.transform = `translate3d(${first.x - last.x}px, ${first.y - last.y}px, 0) scale(1)`;
+      }
+
+      if (!alive && last && first) {
+        node.style.transform = `translate3d(${first.x - last.x}px, ${first.y - last.y}px, 0) scale(0)`;
       }
     });
   }
@@ -125,7 +134,7 @@ class Move extends Component<MoveProps, MoveState> {
     children.forEach(({ key }) => {
       const data = this.childrenData[key];
 
-      if (!data || !data.node) {
+      if (!data || !data.node || !data.alive) {
         return;
       }
 
@@ -138,8 +147,10 @@ class Move extends Component<MoveProps, MoveState> {
           this.setState(state => ({ removed: [...state.removed, key] }));
         });
 
+        data.alive = false;
+
         node.style.opacity = '0';
-        node.style.transform = `translate3d(${first.x - last.x}px, ${first.y - last.y}px, 0) scale(.1)`;
+        node.style.transform = `translate3d(${first!.x - last!.x}px, ${first!.y - last!.y}px, 0) scale(.1)`;
       } else {
         node.style.opacity = '1';
         node.style.transform = 'translate3d(0,0,0) scale(1)';
@@ -148,9 +159,11 @@ class Move extends Component<MoveProps, MoveState> {
   }
 
   onTransitionEnd(node: HTMLElement, callback: () => void) {
-    // data.ignore = true;
+    const listener = (event: Event) => {
+      if (event.target !== node) {
+        return;
+      }
 
-    const listener = () => {
       callback();
 
       node.removeEventListener('transitionend', listener);
@@ -167,6 +180,12 @@ class Move extends Component<MoveProps, MoveState> {
 
       if (!data || !data.node) {
         return;
+      }
+
+      // Reset styles for 'last' to set correct ending position
+      if (type === 'last') {
+        data.node.style.transition = 'none';
+        data.node.style.transform = 'translate3d(0,0,0) scale(1)';
       }
 
       data[type] = data.node.getBoundingClientRect() as DOMRect;
@@ -189,7 +208,7 @@ class Move extends Component<MoveProps, MoveState> {
       // Initial styling
       node.style.transform = 'translate3d(0,0,0) scale(0)';
 
-      this.childrenData[key] = { node };
+      this.childrenData[key] = { node, alive: true };
     }
   }
 
